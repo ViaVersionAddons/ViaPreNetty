@@ -18,6 +18,7 @@ import viaprenetty.protocol.Protocol1_7_2To1_6_4;
 public final class ViaPreNettyPlugin extends JavaPlugin {
 
     private boolean hooked;
+    private boolean serverHooked;
 
     public ViaPreNettyPlugin() {
         LegacyVersions.init();
@@ -36,25 +37,45 @@ public final class ViaPreNettyPlugin extends JavaPlugin {
         manager.registerProtocol(new Protocol1_6_1To1_5_2(), LegacyVersions.R1_5_2, LegacyVersions.R1_6_1);
         manager.registerProtocol(new Protocol1_5_2To1_5_0(), LegacyVersions.R1_5_0, LegacyVersions.R1_5_2);
         manager.registerProtocol(new Protocol1_5_0To1_4_6(), LegacyVersions.R1_4_6, LegacyVersions.R1_5_0);
-        manager.registerBaseProtocol(Direction.SERVERBOUND, new ServerboundBaseProtocol1_7(), Range.closed(LegacyVersions.R1_4_6, LegacyVersions.R1_6_4));
+        manager.registerProtocol(new viaprenetty.protocol.Protocol1_4_6To1_4_4(), LegacyVersions.R1_4_4, LegacyVersions.R1_4_6);
+        manager.registerProtocol(new viaprenetty.protocol.Protocol1_4_4To1_4_2(), LegacyVersions.R1_4_2, LegacyVersions.R1_4_4);
+        manager.registerProtocol(new viaprenetty.protocol.Protocol1_4_2To1_3_1(), LegacyVersions.R1_3_1, LegacyVersions.R1_4_2);
+        manager.registerProtocol(new viaprenetty.protocol.Protocol1_3_1To1_2_4(), LegacyVersions.R1_2_4, LegacyVersions.R1_3_1);
+        manager.registerProtocol(new viaprenetty.protocol.Protocol1_2_4To1_2_1(), LegacyVersions.R1_2_1, LegacyVersions.R1_2_4);
+        manager.registerProtocol(new viaprenetty.protocol.Protocol1_2_1To1_1(), LegacyVersions.R1_1, LegacyVersions.R1_2_1);
+        manager.registerProtocol(new viaprenetty.protocol.Protocol1_1To1_0(), LegacyVersions.R1_0, LegacyVersions.R1_1);
+        manager.registerBaseProtocol(Direction.SERVERBOUND, new ServerboundBaseProtocol1_7(), Range.closed(LegacyVersions.R1_0, LegacyVersions.R1_6_4));
         if (manager.getMaxProtocolPathSize() < 64) {
             manager.setMaxProtocolPathSize(64);
         }
+        manager.setMaxPathDeltaIncrease(-1);
         LegacyVersionProvider.install();
     }
 
     @Override
     public void onEnable() {
         viaprenetty.api.LegacyText.loadServerLanguage(org.bukkit.Bukkit.class.getClassLoader());
-        if (!PaperChannelHook.isSupported()) {
-            getLogger().severe("This server is not running Paper. Legacy clients (1.4.7-1.6.4) need Paper's channel API.");
+        if (PaperChannelHook.isSupported()) {
+            try {
+                PaperChannelHook.install();
+                this.hooked = true;
+            } catch (final ReflectiveOperationException e) {
+                getLogger().severe("Could not hook into the Paper network pipeline: " + e);
+            }
             return;
         }
+        org.bukkit.Bukkit.getScheduler().runTask(this, this::hookServerChannel);
+    }
+
+    private void hookServerChannel() {
         try {
-            PaperChannelHook.install();
-            this.hooked = true;
-        } catch (final ReflectiveOperationException e) {
-            getLogger().severe("Could not hook into the Paper network pipeline: " + e);
+            if (viaprenetty.net.ServerChannelHook.install()) {
+                this.serverHooked = true;
+            } else {
+                getLogger().severe("Could not find the server network channel. Legacy clients (1.0-1.6.4) cannot join.");
+            }
+        } catch (final ReflectiveOperationException | RuntimeException e) {
+            getLogger().severe("Could not hook into the server network pipeline: " + e);
         }
     }
 
@@ -62,6 +83,9 @@ public final class ViaPreNettyPlugin extends JavaPlugin {
     public void onDisable() {
         if (this.hooked) {
             PaperChannelHook.uninstall();
+        }
+        if (this.serverHooked) {
+            viaprenetty.net.ServerChannelHook.uninstall();
         }
     }
 

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public final class LegacyPing extends ChannelInboundHandlerAdapter {
 
     public static final String NAME = "viaprenetty-ping";
-    public static final String VERSION_NAME = "1.4.7-1.6.4";
+    public static final String VERSION_NAME = "1.0-1.6.4";
 
     private final ByteBuf buffer = Unpooled.buffer();
     private ScheduledFuture<?> timeout;

@@ -11,6 +11,13 @@ public final class LegacyVersions {
 
     private static final Map<Integer, ProtocolVersion> BY_ID = new LinkedHashMap<>();
 
+    public static final ProtocolVersion R1_0 = register(22, "1.0", null);
+    public static final ProtocolVersion R1_1 = register(23, "1.1", null);
+    public static final ProtocolVersion R1_2_1 = register(28, "1.2.1-1.2.3", new SubVersionRange("1.2", 1, 3));
+    public static final ProtocolVersion R1_2_4 = register(29, "1.2.4-1.2.5", new SubVersionRange("1.2", 4, 5));
+    public static final ProtocolVersion R1_3_1 = register(39, "1.3.1-1.3.2", new SubVersionRange("1.3", 1, 2));
+    public static final ProtocolVersion R1_4_2 = register(47, "1.4.2", null);
+    public static final ProtocolVersion R1_4_4 = register(49, "1.4.4-1.4.5", new SubVersionRange("1.4", 4, 5));
     public static final ProtocolVersion R1_4_6 = register(51, "1.4.6-1.4.7", new SubVersionRange("1.4", 6, 7));
     public static final ProtocolVersion R1_5_0 = register(60, "1.5-1.5.1", new SubVersionRange("1.5", 0, 1));
     public static final ProtocolVersion R1_5_2 = register(61, "1.5.2", null);

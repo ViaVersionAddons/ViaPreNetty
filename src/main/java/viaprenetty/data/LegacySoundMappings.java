@@ -7,10 +7,12 @@ public final class LegacySoundMappings {
 
     private static final Map<String, String> TO_1_6 = new HashMap<>();
     private static final Map<String, String> TO_1_5 = new HashMap<>();
+    private static final Map<String, String> TO_1_3 = new HashMap<>();
 
     static {
         fill16(TO_1_6);
         fill15(TO_1_5);
+        fill13(TO_1_3);
     }
 
     private LegacySoundMappings() {
@@ -27,6 +29,134 @@ public final class LegacySoundMappings {
 
     public static String to1_5(final String input) {
         return TO_1_5.get(input.startsWith("minecraft:") ? input.substring(10) : input);
+    }
+
+    public static String to1_3(final String input) {
+        return TO_1_3.get(input);
+    }
+
+    private static void fill13(final Map<String, String> m) {
+        m.put("ambient.cave.cave", "ambient.cave.cave");
+        m.put("ambient.weather.rain", "ambient.weather.rain");
+        m.put("ambient.weather.thunder", "ambient.weather.thunder");
+        m.put("damage.fallbig", "damage.fallbig");
+        m.put("damage.fallsmall", "damage.fallsmall");
+        m.put("damage.hit", "damage.hurtflesh");
+        m.put("fire.fire", "fire.fire");
+        m.put("fire.ignite", "fire.ignite");
+        m.put("liquid.lava", "liquid.lava");
+        m.put("liquid.lavapop", "liquid.lavapop");
+        m.put("liquid.splash", "liquid.splash");
+        m.put("liquid.water", "liquid.water");
+        m.put("mob.blaze.breathe", "mob.blaze.breathe");
+        m.put("mob.blaze.death", "mob.blaze.death");
+        m.put("mob.blaze.hit", "mob.blaze.hit");
+        m.put("mob.cat.hiss", "mob.cat.hiss");
+        m.put("mob.cat.hitt", "mob.cat.hitt");
+        m.put("mob.cat.meow", "mob.cat.meow");
+        m.put("mob.cat.purr", "mob.cat.purr");
+        m.put("mob.cat.purreow", "mob.cat.purreow");
+        m.put("mob.chicken.hurt", "mob.chickenhurt");
+        m.put("mob.chicken.plop", "mob.chickenplop");
+        m.put("mob.chicken.say", "mob.chicken");
+        m.put("mob.cow.hurt", "mob.cowhurt");
+        m.put("mob.cow.say", "mob.cow");
+        m.put("mob.creeper.death", "mob.creeperdeath");
+        m.put("mob.creeper.say", "mob.creeper");
+        m.put("mob.endermen.death", "mob.endermen.death");
+        m.put("mob.endermen.hit", "mob.endermen.hit");
+        m.put("mob.endermen.idle", "mob.endermen.idle");
+        m.put("mob.endermen.portal", "mob.endermen.portal");
+        m.put("mob.endermen.scream", "mob.endermen.scream");
+        m.put("mob.endermen.stare", "mob.endermen.stare");
+        m.put("mob.ghast.affectionate_scream", "mob.ghast.affectionate scream");
+        m.put("mob.ghast.charge", "mob.ghast.charge");
+        m.put("mob.ghast.death", "mob.ghast.death");
+        m.put("mob.ghast.fireball", "mob.ghast.fireball");
+        m.put("mob.ghast.moan", "mob.ghast.moan");
+        m.put("mob.ghast.scream", "mob.ghast.scream");
+        m.put("mob.irongolem.death", "mob.irongolem.death");
+        m.put("mob.irongolem.hit", "mob.irongolem.hit");
+        m.put("mob.irongolem.throw", "mob.irongolem.throw");
+        m.put("mob.irongolem.walk", "mob.irongolem.walk");
+        m.put("mob.magmacube.big", "mob.magmacube.big");
+        m.put("mob.magmacube.jump", "mob.magmacube.jump");
+        m.put("mob.magmacube.small", "mob.magmacube.small");
+        m.put("mob.pig.death", "mob.pigdeath");
+        m.put("mob.pig.say", "mob.pig");
+        m.put("mob.sheep.say", "mob.sheep");
+        m.put("mob.silverfish.hit", "mob.silverfish.hit");
+        m.put("mob.silverfish.kill", "mob.silverfish.kill");
+        m.put("mob.silverfish.say", "mob.silverfish.say");
+        m.put("mob.silverfish.step", "mob.silverfish.step");
+        m.put("mob.skeleton.death", "mob.skeletondeath");
+        m.put("mob.skeleton.hurt", "mob.skeletonhurt");
+        m.put("mob.skeleton.say", "mob.skeleton");
+        m.put("mob.slime.attack", "mob.slimeattack");
+        m.put("mob.slime.small", "mob.slime");
+        m.put("mob.spider.death", "mob.spiderdeath");
+        m.put("mob.spider.say", "mob.spider");
+        m.put("mob.villager.default", "mob.villager.default");
+        m.put("mob.villager.defaultdeath", "mob.villager.defaultdeath");
+        m.put("mob.villager.defaulthurt", "mob.villager.defaulthurt");
+        m.put("mob.wolf.bark", "mob.wolf.bark");
+        m.put("mob.wolf.death", "mob.wolf.death");
+        m.put("mob.wolf.growl", "mob.wolf.growl");
+        m.put("mob.wolf.howl", "mob.wolf.howl");
+        m.put("mob.wolf.hurt", "mob.wolf.hurt");
+        m.put("mob.wolf.panting", "mob.wolf.panting");
+        m.put("mob.wolf.shake", "mob.wolf.shake");
+        m.put("mob.wolf.whine", "mob.wolf.whine");
+        m.put("mob.zombie.death", "mob.zombiedeath");
+        m.put("mob.zombie.hurt", "mob.zombiehurt");
+        m.put("mob.zombie.metal", "mob.zombie.metal");
+        m.put("mob.zombie.say", "mob.zombie");
+        m.put("mob.zombie.wood", "mob.zombie.wood");
+        m.put("mob.zombie.woodbreak", "mob.zombie.woodbreak");
+        m.put("mob.zombiepig.zpig", "mob.zombiepig.zpig");
+        m.put("mob.zombiepig.zpigangry", "mob.zombiepig.zpigangry");
+        m.put("mob.zombiepig.zpigdeath", "mob.zombiepig.zpigdeath");
+        m.put("mob.zombiepig.zpighurt", "mob.zombiepig.zpighurt");
+        m.put("note.bass", "note.bass");
+        m.put("note.bassattack", "note.bassattack");
+        m.put("note.bd", "note.bd");
+        m.put("note.harp", "note.harp");
+        m.put("note.hat", "note.hat");
+        m.put("note.pling", "note.pling");
+        m.put("note.snare", "note.snare");
+        m.put("portal.portal", "portal.portal");
+        m.put("portal.travel", "portal.travel");
+        m.put("portal.trigger", "portal.trigger");
+        m.put("random.bow", "random.bow");
+        m.put("random.bowhit", "random.bowhit");
+        m.put("random.break", "random.break");
+        m.put("random.breath", "random.breath");
+        m.put("random.burp", "random.burp");
+        m.put("random.chestclosed", "random.chestclosed");
+        m.put("random.chestopen", "random.chestopen");
+        m.put("random.click", "random.click");
+        m.put("random.door_close", "random.door_close");
+        m.put("random.door_open", "random.door_open");
+        m.put("random.drink", "random.drink");
+        m.put("random.eat", "random.eat");
+        m.put("random.explode", "random.explode");
+        m.put("random.fizz", "random.fizz");
+        m.put("random.fuse", "random.fuse");
+        m.put("random.glass", "random.glass");
+        m.put("random.levelup", "random.levelup");
+        m.put("random.orb", "random.orb");
+        m.put("random.pop", "random.pop");
+        m.put("random.splash", "random.splash");
+        m.put("random.wood_click", "random.wood click");
+        m.put("step.cloth", "step.cloth");
+        m.put("step.grass", "step.grass");
+        m.put("step.gravel", "step.gravel");
+        m.put("step.sand", "step.sand");
+        m.put("step.snow", "step.snow");
+        m.put("step.stone", "step.stone");
+        m.put("step.wood", "step.wood");
+        m.put("tile.piston.in", "tile.piston.in");
+        m.put("tile.piston.out", "tile.piston.out");
     }
 
     private static void fill16(final Map<String, String> m) {

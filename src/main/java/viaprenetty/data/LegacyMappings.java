@@ -118,6 +118,151 @@ public final class LegacyMappings {
         .validItems(id -> (id >= 0 && id <= 145) || (id >= 256 && id <= 403) || (id >= 2256 && id <= 2267))
         .maxEffect(20);
 
+    public static final BlockRemapper BLOCKS_1_4_4 = new BlockRemapper()
+        .replaceMeta(43, 6, 112, 0)
+        .replaceMeta(44, 6, 44, 0)
+        .replaceMeta(44, 14, 44, 8)
+        .fallback(id -> id >= 0 && id <= 145, 1, 0);
+
+    public static final LegacyItemRemapper ITEMS_1_4_4 = new LegacyItemRemapper("1_4_4", "1.4.6")
+        .mapMeta(43, 6, 112, 0, "Nether Brick Double Slab")
+        .mapMeta(44, 6, 44, 0, "Nether Brick Slab")
+        .map(401, 289, 0, "Firework Rocket")
+        .map(402, 351, 8, "Firework Star")
+        .map(403, 340, 0, "Enchanted Book")
+        .validItems(id -> (id >= 0 && id <= 145) || (id >= 256 && id <= 400) || (id >= 2256 && id <= 2267))
+        .maxEffect(20);
+
+    public static final BlockRemapper BLOCKS_1_4_2 = new BlockRemapper()
+        .fallback(id -> id >= 0 && id <= 145, 1, 0);
+
+    public static final LegacyItemRemapper ITEMS_1_4_2 = new LegacyItemRemapper("1_4_2", "1.4.4")
+        .map(2267, 2256, 0, "Music Disc (wait)")
+        .validItems(id -> (id >= 0 && id <= 145) || (id >= 256 && id <= 400) || (id >= 2256 && id <= 2266))
+        .maxEffect(20);
+
+    public static final BlockRemapper BLOCKS_1_3 = new BlockRemapper()
+        .replace(137, 1, 0)
+        .replace(138, 20, 0)
+        .replaceMeta(139, 0, 4, 0)
+        .replaceMetaRange(139, 1, 15, 48, 0)
+        .replace(140, 0, 0)
+        .replaceKeepMeta(141, 59)
+        .replaceKeepMeta(142, 59)
+        .replaceKeepMeta(143, 77)
+        .replace(144, 0, 0)
+        .replace(145, 42, 0)
+        .fallback(id -> id >= 0 && id <= 136, 1, 0);
+
+    public static final LegacyItemRemapper ITEMS_1_3 = new LegacyItemRemapper("1_3", "1.4.2")
+        .map(137, 1, 0, "Command Block")
+        .map(138, 20, 0, "Beacon")
+        .mapMeta(139, 0, 4, 0, "Cobblestone Wall")
+        .mapMeta(139, 1, 48, 0, "Mossy Cobblestone Wall")
+        .map(143, 77, 0, "Wooden Button")
+        .map(144, 352, 0, "Skull")
+        .map(145, 42, 0, "Anvil")
+        .map(389, 321, 0, "Item Frame")
+        .map(390, 336, 0, "Flower Pot")
+        .map(391, 260, 0, "Carrot")
+        .map(392, 260, 0, "Potato")
+        .map(393, 297, 0, "Baked Potato")
+        .map(394, 260, 0, "Poisonous Potato")
+        .map(395, 358, 0, "Empty Map")
+        .map(396, 322, 0, "Golden Carrot")
+        .map(397, 352, 0, "Skull")
+        .map(398, 346, 0, "Carrot on a Stick")
+        .map(399, 264, 0, "Nether Star")
+        .map(400, 357, 0, "Pumpkin Pie")
+        .mapMeta(383, 65, 383, 90, "Spawn Bat")
+        .mapMeta(383, 66, 383, 90, "Spawn Witch")
+        .validItems(id -> (id >= 0 && id <= 136) || (id >= 256 && id <= 388) || (id >= 2256 && id <= 2266))
+        .maxEffect(19);
+
+    public static final BlockRemapper BLOCKS_1_2 = new BlockRemapper()
+        .replaceMasked(17, 17, 0x3, 0)
+        .replace(125, 43, 2)
+        .replace(126, 44, 2)
+        .replace(127, 0, 0)
+        .replaceKeepMeta(128, 53)
+        .replace(129, 1, 0)
+        .replaceKeepMeta(130, 54)
+        .replace(131, 0, 0)
+        .replace(132, 0, 0)
+        .replace(133, 42, 0)
+        .replaceKeepMeta(134, 53)
+        .replaceKeepMeta(135, 53)
+        .replaceKeepMeta(136, 53)
+        .fallback(id -> id >= 0 && id <= 124, 1, 0);
+
+    public static final LegacyItemRemapper ITEMS_1_2 = new LegacyItemRemapper("1_2", "1.3")
+        .map(125, 44, 2, "Wooden Double Slab")
+        .map(126, 44, 2, "Wooden Slab")
+        .map(127, 351, 3, "Cocoa")
+        .map(128, 53, 0, "Sandstone Stairs")
+        .map(129, 1, 0, "Emerald Ore")
+        .map(130, 54, 0, "Ender Chest")
+        .map(131, 69, 0, "Tripwire Hook")
+        .map(132, 287, 0, "Tripwire")
+        .map(133, 42, 0, "Block of Emerald")
+        .map(134, 53, 0, "Spruce Stairs")
+        .map(135, 53, 0, "Birch Stairs")
+        .map(136, 53, 0, "Jungle Stairs")
+        .mapMeta(322, 1, 322, 0, "Enchanted Golden Apple")
+        .map(386, 340, 0, "Book and Quill")
+        .map(387, 340, 0, "Written Book")
+        .map(388, 264, 0, "Emerald")
+        .validItems(id -> (id >= 0 && id <= 124) || (id >= 256 && id <= 385) || (id >= 2256 && id <= 2266))
+        .maxEffect(19);
+
+    public static final BlockRemapper BLOCKS_1_2_1 = new BlockRemapper()
+        .replaceMetaRange(5, 1, 15, 5, 0)
+        .replaceMetaRange(24, 1, 15, 24, 0)
+        .fallback(id -> id >= 0 && id <= 124, 1, 0);
+
+    public static final LegacyItemRemapper ITEMS_1_2_1 = new LegacyItemRemapper("1_2_1", "1.2.4")
+        .mapMeta(5, 1, 5, 0, "Spruce Planks")
+        .mapMeta(5, 2, 5, 0, "Birch Planks")
+        .mapMeta(5, 3, 5, 0, "Jungle Planks")
+        .mapMeta(24, 1, 24, 0, "Chiseled Sandstone")
+        .mapMeta(24, 2, 24, 0, "Smooth Sandstone")
+        .validItems(id -> (id >= 0 && id <= 124) || (id >= 256 && id <= 385) || (id >= 2256 && id <= 2266))
+        .maxEffect(19);
+
+    public static final BlockRemapper BLOCKS_1_1 = new BlockRemapper()
+        .replaceMeta(6, 3, 6, 0)
+        .replaceMeta(17, 3, 17, 0)
+        .replaceMeta(18, 3, 18, 0)
+        .replaceMeta(18, 7, 18, 4)
+        .replaceMeta(18, 11, 18, 8)
+        .replaceMeta(18, 15, 18, 12)
+        .replaceMeta(98, 3, 98, 0)
+        .replace(123, 89, 0)
+        .replace(124, 89, 0)
+        .fallback(id -> id >= 0 && id <= 122, 1, 0);
+
+    public static final LegacyItemRemapper ITEMS_1_1 = new LegacyItemRemapper("1_1", "1.2")
+        .mapMeta(6, 3, 6, 0, "Jungle Sapling")
+        .mapMeta(17, 3, 17, 0, "Jungle Wood")
+        .mapMeta(18, 3, 18, 0, "Jungle Leaves")
+        .mapMeta(98, 3, 98, 0, "Chiseled Stone Bricks")
+        .map(123, 89, 0, "Redstone Lamp")
+        .map(124, 89, 0, "Redstone Lamp")
+        .map(384, 373, 0, "Bottle o' Enchanting")
+        .map(385, 341, 0, "Fire Charge")
+        .mapMeta(383, 98, 383, 90, "Spawn Ocelot")
+        .validItems(id -> (id >= 0 && id <= 122) || (id >= 256 && id <= 383) || (id >= 2256 && id <= 2266))
+        .maxEffect(19);
+
+    public static final BlockRemapper BLOCKS_1_0 = new BlockRemapper()
+        .fallback(id -> id >= 0 && id <= 122, 1, 0);
+
+    public static final LegacyItemRemapper ITEMS_1_0 = new LegacyItemRemapper("1_0", "1.1")
+        .map(383, 344, 0, "Spawn Egg")
+        .validItems(id -> (id >= 0 && id <= 122) || (id >= 256 && id <= 382) || (id >= 2256 && id <= 2266))
+        .validEnchantments(id -> (id >= 0 && id <= 7) || (id >= 16 && id <= 21) || (id >= 32 && id <= 35))
+        .maxEffect(19);
+
     private LegacyMappings() {
     }
 

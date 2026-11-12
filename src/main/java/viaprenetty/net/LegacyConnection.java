@@ -30,6 +30,7 @@ public final class LegacyConnection extends ChannelDuplexHandler {
 
     private enum Phase {
         HANDSHAKE,
+        OLD_LOGIN,
         ENCRYPTION,
         AWAIT_SPAWN,
         LOGIN,
@@ -118,13 +119,37 @@ public final class LegacyConnection extends ChannelDuplexHandler {
                     kick(ctx, "Unexpected packet");
                     return true;
                 }
+                if (this.cumulation.getUnsignedByte(this.cumulation.readerIndex()) == 0) {
+                    final String info = readString(this.cumulation);
+                    final int split = info.indexOf(';');
+                    this.username = split >= 0 ? info.substring(0, split) : info;
+                    this.host = "";
+                    this.port = 25565;
+                    if (split >= 0) {
+                        final String address = info.substring(split + 1);
+                        final int colon = address.lastIndexOf(':');
+                        this.host = colon >= 0 ? address.substring(0, colon) : address;
+                        if (colon >= 0) {
+                            try {
+                                this.port = Integer.parseInt(address.substring(colon + 1));
+                            } catch (final NumberFormatException ignored) {
+                            }
+                        }
+                    }
+                    final ByteBuf out = ctx.alloc().buffer();
+                    out.writeByte(0x02);
+                    writeString(out, "-");
+                    ctx.writeAndFlush(out);
+                    this.phase = Phase.OLD_LOGIN;
+                    return true;
+                }
                 final int protocol = this.cumulation.readUnsignedByte();
                 final String name = readString(this.cumulation);
                 final String address = readString(this.cumulation);
                 final int targetPort = this.cumulation.readInt();
                 this.version = LegacyVersions.byProtocolId(protocol);
                 if (this.version == null) {
-                    kick(ctx, "Unsupported client version (protocol " + protocol + "). Supported: 1.4.6-1.6.4");
+                    kick(ctx, "Unsupported client version (protocol " + protocol + "). Supported: " + LegacyPing.VERSION_NAME);
                     return true;
                 }
                 this.v16 = this.version.newerThanOrEqualTo(LegacyVersions.R1_6_1);
@@ -133,6 +158,36 @@ public final class LegacyConnection extends ChannelDuplexHandler {
                 this.port = targetPort;
                 sendAuthRequest(ctx);
                 this.phase = Phase.ENCRYPTION;
+                return true;
+            }
+            case OLD_LOGIN -> {
+                final int id = this.cumulation.readUnsignedByte();
+                if (id != 0x01) {
+                    kick(ctx, "Unexpected packet");
+                    return true;
+                }
+                final int protocol = this.cumulation.readInt();
+                final String name = readString(this.cumulation);
+                if (protocol >= 28) {
+                    readString(this.cumulation);
+                    this.cumulation.skipBytes(11);
+                } else if (protocol == 23) {
+                    this.cumulation.skipBytes(8);
+                    readString(this.cumulation);
+                    this.cumulation.skipBytes(8);
+                } else {
+                    this.cumulation.skipBytes(16);
+                }
+                this.version = LegacyVersions.byProtocolId(protocol);
+                if (this.version == null) {
+                    kick(ctx, "Outdated client! Supported: " + LegacyPing.VERSION_NAME);
+                    return true;
+                }
+                if (!name.isEmpty()) {
+                    this.username = name;
+                }
+                this.phase = Phase.LOGIN;
+                startServerLogin(ctx);
                 return true;
             }
             case ENCRYPTION -> {
@@ -220,7 +275,7 @@ public final class LegacyConnection extends ChannelDuplexHandler {
             return null;
         }
         final int begin = this.cumulation.readerIndex();
-        LegacyPacketReader.skip(type, this.v16, this.cumulation);
+        LegacyPacketReader.skip(type, this.version.getVersion(), this.cumulation);
         final int length = this.cumulation.readerIndex() - begin;
         if (type == LegacyServerbound.DISCONNECT) {
             this.phase = Phase.CLOSED;

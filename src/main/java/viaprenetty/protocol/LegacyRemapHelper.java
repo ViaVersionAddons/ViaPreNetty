@@ -22,10 +22,48 @@ final class LegacyRemapHelper {
 
     private final BlockRemapper blocks;
     private final LegacyItemRemapper items;
+    private boolean bulkSkyFlag = true;
+    private boolean tradeDisabledFlag = true;
+    private boolean chunks = true;
+    private com.viaversion.viaversion.api.type.Type<Item> clientItem = RewindTypes.COMPRESSED_NBT_ITEM;
+    private com.viaversion.viaversion.api.type.Type<Item[]> clientItemArray = RewindTypes.COMPRESSED_NBT_ITEM_ARRAY;
+    private com.viaversion.viaversion.api.type.Type<Item> serverItem = RewindTypes.COMPRESSED_NBT_ITEM;
+    private com.viaversion.viaversion.api.type.Type<Item[]> serverItemArray = RewindTypes.COMPRESSED_NBT_ITEM_ARRAY;
 
     LegacyRemapHelper(final BlockRemapper blocks, final LegacyItemRemapper items) {
         this.blocks = blocks;
         this.items = items;
+    }
+
+    LegacyRemapHelper withoutBulkSkyFlag() {
+        this.bulkSkyFlag = false;
+        return this;
+    }
+
+    LegacyRemapHelper withoutChunks() {
+        this.chunks = false;
+        return this;
+    }
+
+    LegacyRemapHelper withClientItems(final com.viaversion.viaversion.api.type.Type<Item> item, final com.viaversion.viaversion.api.type.Type<Item[]> array) {
+        this.clientItem = item;
+        this.clientItemArray = array;
+        return this;
+    }
+
+    LegacyRemapHelper withServerItems(final com.viaversion.viaversion.api.type.Type<Item> item, final com.viaversion.viaversion.api.type.Type<Item[]> array) {
+        this.serverItem = item;
+        this.serverItemArray = array;
+        return this;
+    }
+
+    com.viaversion.viaversion.api.type.Type<Item> clientItem() {
+        return this.clientItem;
+    }
+
+    LegacyRemapHelper withoutTradeDisabledFlag() {
+        this.tradeDisabledFlag = false;
+        return this;
     }
 
     BlockRemapper blocks() {
@@ -38,8 +76,16 @@ final class LegacyRemapHelper {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     void registerShared(final Protocol protocol, final boolean handleEquipment, final boolean handleWindowItems) {
-        protocol.registerClientbound(LegacyClientbound.LEVEL_CHUNK, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) this::chunk);
-        protocol.registerClientbound(LegacyClientbound.MAP_BULK_CHUNK, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> Protocol1_7_2To1_6_4.handleBulk(wrapper, this.blocks));
+        if (this.chunks) {
+            protocol.registerClientbound(LegacyClientbound.LEVEL_CHUNK, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) this::chunk);
+            protocol.registerClientbound(LegacyClientbound.MAP_BULK_CHUNK, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> {
+                if (this.bulkSkyFlag) {
+                    Protocol1_7_2To1_6_4.handleBulk(wrapper, this.blocks);
+                } else {
+                    bulkWithoutSkyFlag(wrapper);
+                }
+            });
+        }
         protocol.registerClientbound(LegacyClientbound.CHUNK_BLOCKS_UPDATE, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> Protocol1_7_2To1_6_4.handleMultiBlock(wrapper, this.blocks));
         protocol.registerClientbound(LegacyClientbound.BLOCK_UPDATE, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) this::blockUpdate);
         protocol.registerClientbound(LegacyClientbound.BLOCK_EVENT, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) this::blockEvent);
@@ -48,20 +94,22 @@ final class LegacyRemapHelper {
             protocol.registerClientbound(LegacyClientbound.SET_EQUIPPED_ITEM, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> {
                 wrapper.passthrough(Types.INT);
                 wrapper.passthrough(Types.SHORT);
-                this.items.toClient(wrapper.passthrough(RewindTypes.COMPRESSED_NBT_ITEM));
+                wrapper.write(this.clientItem, this.items.toClient(wrapper.read(this.serverItem)));
             });
         }
         protocol.registerClientbound(LegacyClientbound.CONTAINER_SET_SLOT, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> {
             wrapper.passthrough(Types.BYTE);
             wrapper.passthrough(Types.SHORT);
-            this.items.toClient(wrapper.passthrough(RewindTypes.COMPRESSED_NBT_ITEM));
+            wrapper.write(this.clientItem, this.items.toClient(wrapper.read(this.serverItem)));
         });
         if (handleWindowItems) {
             protocol.registerClientbound(LegacyClientbound.CONTAINER_SET_CONTENT, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> {
                 wrapper.passthrough(Types.BYTE);
-                for (Item item : wrapper.passthrough(RewindTypes.COMPRESSED_NBT_ITEM_ARRAY)) {
+                final Item[] array = wrapper.read(this.serverItemArray);
+                for (Item item : array) {
                     this.items.toClient(item);
                 }
+                wrapper.write(this.clientItemArray, array);
             });
         }
         protocol.registerServerbound(LegacyServerbound.USE_ITEM_ON, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> {
@@ -69,7 +117,7 @@ final class LegacyRemapHelper {
             wrapper.passthrough(Types.UNSIGNED_BYTE);
             wrapper.passthrough(Types.INT);
             wrapper.passthrough(Types.BYTE);
-            this.items.toServer(wrapper.passthrough(RewindTypes.COMPRESSED_NBT_ITEM));
+            wrapper.write(this.serverItem, this.items.toServer(wrapper.read(this.clientItem)));
         });
         protocol.registerServerbound(LegacyServerbound.CONTAINER_CLICK, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> {
             wrapper.passthrough(Types.BYTE);
@@ -77,11 +125,11 @@ final class LegacyRemapHelper {
             wrapper.passthrough(Types.BYTE);
             wrapper.passthrough(Types.SHORT);
             wrapper.passthrough(Types.BYTE);
-            this.items.toServer(wrapper.passthrough(RewindTypes.COMPRESSED_NBT_ITEM));
+            wrapper.write(this.serverItem, this.items.toServer(wrapper.read(this.clientItem)));
         });
         protocol.registerServerbound(LegacyServerbound.SET_CREATIVE_MODE_SLOT, (com.viaversion.viaversion.api.protocol.remapper.PacketHandler) wrapper -> {
             wrapper.passthrough(Types.SHORT);
-            this.items.toServer(wrapper.passthrough(RewindTypes.COMPRESSED_NBT_ITEM));
+            wrapper.write(this.serverItem, this.items.toServer(wrapper.read(this.clientItem)));
         });
     }
 
@@ -98,6 +146,44 @@ final class LegacyRemapHelper {
         final byte[] out = remapped != null ? remapped : compressed;
         wrapper.write(Types.INT, out.length);
         wrapper.write(Types.REMAINING_BYTES, out);
+    }
+
+    void bulkWithoutSkyFlag(final PacketWrapper wrapper) {
+        final short count = wrapper.read(Types.SHORT);
+        final int length = wrapper.read(Types.INT);
+        final boolean skyLight = wrapper.read(Types.BOOLEAN);
+        final byte[] rest = wrapper.read(Types.REMAINING_BYTES);
+        final int metaLength = count * 12;
+        if (rest.length < length + metaLength) {
+            wrapper.cancel();
+            return;
+        }
+        final byte[] compressed = java.util.Arrays.copyOfRange(rest, 0, length);
+        final ByteBuf meta = Unpooled.wrappedBuffer(rest, length, metaLength);
+        final int[] primary = new int[count];
+        final int[] add = new int[count];
+        for (int i = 0; i < count; i++) {
+            meta.skipBytes(8);
+            primary[i] = meta.readUnsignedShort();
+            add[i] = meta.readUnsignedShort();
+        }
+        final byte[] remapped = LegacyChunkRemapper.remapBulk(compressed, primary, add, skyLight, this.blocks);
+        byte[] out = remapped != null ? remapped : compressed;
+        if (!skyLight) {
+            final byte[] raw = LegacyChunkRemapper.inflate(out);
+            final byte[] withSky = raw == null ? null : LegacyChunkRemapper.addSkyLight(raw, primary, add);
+            if (withSky == null) {
+                wrapper.cancel();
+                return;
+            }
+            out = LegacyChunkRemapper.deflate(withSky);
+        }
+        final byte[] combined = new byte[out.length + metaLength];
+        System.arraycopy(out, 0, combined, 0, out.length);
+        System.arraycopy(rest, length, combined, out.length, metaLength);
+        wrapper.write(Types.SHORT, count);
+        wrapper.write(Types.INT, out.length);
+        wrapper.write(Types.REMAINING_BYTES, combined);
     }
 
     void blockUpdate(final PacketWrapper wrapper) {
@@ -196,7 +282,10 @@ final class LegacyRemapHelper {
                 if (third) {
                     RewindTypes.COMPRESSED_NBT_ITEM.write(out, this.items.toClient(RewindTypes.COMPRESSED_NBT_ITEM.read(in)));
                 }
-                out.writeBoolean(in.readBoolean());
+                final boolean disabled = in.readBoolean();
+                if (this.tradeDisabledFlag) {
+                    out.writeBoolean(disabled);
+                }
             }
             final byte[] result = new byte[out.readableBytes()];
             out.readBytes(result);

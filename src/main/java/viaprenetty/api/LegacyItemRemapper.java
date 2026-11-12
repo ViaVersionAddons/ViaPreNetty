@@ -45,6 +45,11 @@ public final class LegacyItemRemapper {
         return this;
     }
 
+    public LegacyItemRemapper validEnchantments(final IntPredicate predicate) {
+        this.validEnchantments = predicate;
+        return this;
+    }
+
     public LegacyItemRemapper maxEffect(final int maxEffect) {
         this.maxEffect = maxEffect;
         return this;

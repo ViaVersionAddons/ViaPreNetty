@@ -47,7 +47,7 @@ public final class LegacyChunkRemapper {
         return changed ? deflate(data) : null;
     }
 
-    private static boolean remapSections(final byte[] data, final int offset, final int sections, final BlockRemapper remapper) {
+    public static boolean remapSections(final byte[] data, final int offset, final int sections, final BlockRemapper remapper) {
         final int blockCount = sections * 4096;
         final int metaOffset = offset + blockCount;
         if (metaOffset + sections * 2048 > data.length) {
@@ -79,7 +79,7 @@ public final class LegacyChunkRemapper {
         return changed;
     }
 
-    private static byte[] inflate(final byte[] compressed) {
+    public static byte[] inflate(final byte[] compressed) {
         final Inflater inflater = INFLATER.get();
         inflater.reset();
         inflater.setInput(compressed);
@@ -101,7 +101,7 @@ public final class LegacyChunkRemapper {
         return out.toByteArray();
     }
 
-    private static byte[] deflate(final byte[] data) {
+    public static byte[] deflate(final byte[] data) {
         final Deflater deflater = DEFLATER.get();
         deflater.reset();
         deflater.setInput(data);
@@ -113,6 +113,31 @@ public final class LegacyChunkRemapper {
             out.write(buffer, 0, written);
         }
         return out.toByteArray();
+    }
+
+    public static byte[] addSkyLight(final byte[] raw, final int[] primaryBitmasks, final int[] addBitmasks) {
+        int total = 0;
+        for (int i = 0; i < primaryBitmasks.length; i++) {
+            total += Integer.bitCount(primaryBitmasks[i]) * 10240 + Integer.bitCount(addBitmasks[i]) * 2048 + 256;
+        }
+        final byte[] out = new byte[total];
+        int in = 0;
+        int pos = 0;
+        for (int i = 0; i < primaryBitmasks.length; i++) {
+            final int sections = Integer.bitCount(primaryBitmasks[i]);
+            final int head = sections * 8192;
+            final int tail = Integer.bitCount(addBitmasks[i]) * 2048 + 256;
+            if (in + head + tail > raw.length) {
+                return null;
+            }
+            System.arraycopy(raw, in, out, pos, head);
+            pos += head + sections * 2048;
+            in += head;
+            System.arraycopy(raw, in, out, pos, tail);
+            pos += tail;
+            in += tail;
+        }
+        return out;
     }
 
 }
